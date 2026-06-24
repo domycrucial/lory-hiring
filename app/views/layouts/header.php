@@ -6,6 +6,8 @@ if ($basePath !== '' && str_starts_with($requestUri, $basePath)) {
     $requestUri = substr($requestUri, strlen($basePath));
 }
 $requestUri = trim($requestUri, '/');
+// Determine if we are on an authentication page
+$isAuthPage = str_starts_with($requestUri, 'auth');
 
 // Determine if we should wrap pages in the sidebar dashboard layout
 $inDashboard = isLoggedIn();
@@ -45,12 +47,15 @@ $inDashboard = isLoggedIn();
             <span class="logo-icon">🚛</span> OLHS
         </a>
 
-        <!-- Mobile hamburger drawer toggle button -->
+        <!-- Mobile hamburger drawer toggle button (Omitted on auth pages) -->
+        <?php if (!$isAuthPage): ?>
         <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
             <i class="fa-solid fa-bars"></i>
         </button>
+        <?php endif; ?>
 
-        <!-- Main links list element -->
+        <!-- Main links list element (Omitted on auth pages) -->
+        <?php if (!$isAuthPage): ?>
         <ul class="nav-links" id="nav-links">
             <?php if (isLoggedIn()): ?>
                 <?php if ($inDashboard): ?>
@@ -81,6 +86,7 @@ $inDashboard = isLoggedIn();
                 <li><a href="<?= APP_URL ?>/auth/register" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-plus"></i> Register</a></li>
             <?php endif; ?>
         </ul>
+        <?php endif; ?>
     </div>
 </nav>
 
