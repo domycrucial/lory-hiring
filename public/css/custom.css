@@ -1,0 +1,1374 @@
+/* =============================================================
+   OLHS — Online Lorries Hiring System
+   Premium Design System v2.0
+   Fully customized responsive interface with comments on design tokens
+   ============================================================= */
+
+/* ─── CSS Custom Properties (Design Tokens) ─────────────────── */
+:root {
+  /* Premium Typography - Standardized to a Single Font Family */
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'Inter', -apple-system, sans-serif;
+
+  /* Color Palette — Electric Blue (trust/movement) & Cyan (modern tech) */
+  --primary:        #2563eb;       /* Primary brand color: royal blue */
+  --primary-dark:   #1d4ed8;       /* Dark variant for button hover states */
+  --primary-light:  #60a5fa;       /* Light variant for borders and subtle details */
+  --primary-bg:     #eff6ff;       /* Soft blue background for active selections */
+
+  /* Accent Color — Golden Amber (action, alert, highlight) */
+  --accent:         #f59e0b;       /* Warm yellow/gold for CTA and stars */
+  --accent-dark:    #d97706;       /* Dark variant for amber buttons */
+  --accent-light:   #fef3c7;       /* Soft background for warnings/pending badges */
+
+  /* Neutral Shades for Layout, Borders, and Typography */
+  --gray-50:  #f8fafc;             /* Screen base background */
+  --gray-100: #f1f5f9;             /* Alternating table rows, inactive card background */
+  --gray-200: #e2e8f0;             /* Standard border color */
+  --gray-300: #cbd5e1;             /* Disabled state borders */
+  --gray-400: #94a3b8;             /* Placeholder text, secondary icons */
+  --gray-500: #64748b;             /* Subtitles and supporting description text */
+  --gray-600: #475569;             /* Main body typography */
+  --gray-700: #334155;             /* Secondary headings and active links */
+  --gray-800: #1e293b;             /* Navigation headers and cards titles */
+  --gray-900: #0f172a;             /* Main headings and dark UI sections */
+
+  /* Dynamic Mode Variables */
+  --card-bg:          #ffffff;
+  --input-bg:         #ffffff;
+  --table-header-bg:  #f8fafc;
+  --border-color:     rgba(226, 232, 240, 0.8);
+  --nav-bg:           rgba(255, 255, 255, 0.85);
+
+  /* Premium Gradients */
+  --grad-primary:  linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);  /* Core background gradient */
+  --grad-dark:     linear-gradient(135deg, #0f172a 0%, #1e293b 100%);  /* Dark section background */
+  --grad-accent:   linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);  /* Highlights and active CTA */
+
+  /* Semantic Messaging Colors */
+  --success:    #10b981;           /* Emerald Green for success messages/badges */
+  --success-bg: #ecfdf5;           /* Light green background for alerts */
+  --warning:    #f59e0b;           /* Amber for alerts and actions */
+  --warning-bg: #fffbeb;           /* Alert message backgrounds */
+  --danger:     #ef4444;           /* Coral red for errors and critical deletions */
+  --danger-bg:  #fef2f2;           /* Red background for alerts */
+  --info:       #3b82f6;           /* Sky blue for system notifications */
+  --info-bg:    #eff6ff;           /* Info banner backgrounds */
+
+  /* Spacing Scale (Rem units) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Border Radii for modern curved aesthetics */
+  --radius-sm:   6px;
+  --radius-md:  12px;
+  --radius-lg:  18px;
+  --radius-xl:  24px;
+  --radius-full: 9999px;
+  --border: 1px solid var(--border-color);
+
+  /* Premium Box Shadows */
+  --shadow-sm:  0 1px 3px rgba(15, 23, 42, 0.05);                                 /* Tiny element depth */
+  --shadow-md:  0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05); /* Card depth */
+  --shadow-lg:  0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08); /* Hovered card depth */
+  --shadow-xl:  0 20px 40px -10px rgba(15, 23, 42, 0.12), 0 10px 15px -8px rgba(15, 23, 42, 0.12); /* Modal/Hero depth */
+
+  /* Transitions and Micro-animations */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);  /* Smooth acceleration/deceleration curve */
+  --duration: 250ms;                     /* General duration of hover states */
+
+  /* Layout Widths & Heights */
+  --nav-height: 72px;                     /* Heights of top navigation bar */
+  --sidebar-width: 280px;                 /* Sidebar width for Admin/Owner views */
+  --container-max: 1200px;                /* Maximum layout body width */
+}
+
+/* ─── Dark Mode Overrides ───────────────────────────────────── */
+[data-theme="dark"] {
+  --gray-50:  #0f172a;             /* Main body dark bg */
+  --gray-100: #1e293b;             /* Alternate row/subtle backgrounds */
+  --gray-200: #334155;             /* Borders */
+  --gray-300: #475569;
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;             /* Muted texts */
+  --gray-600: #cbd5e1;             /* Body texts */
+  --gray-700: #e2e8f0;
+  --gray-800: #f1f5f9;             /* Titles/Headers */
+  --gray-900: #f8fafc;
+
+  --primary:        #3b82f6;
+  --primary-dark:   #60a5fa;
+  --primary-light:  #2563eb;
+  --primary-bg:     #1e293b;
+
+  --accent:         #fbbf24;
+  --accent-dark:    #f59e0b;
+  --accent-light:   #451a03;
+
+  --success-bg: #064e3b;
+  --warning-bg: #78350f;
+  --danger-bg:  #7f1d1d;
+  --info-bg:    #1e3a8a;
+
+  --card-bg:          #1e293b;
+  --input-bg:         #0f172a;
+  --table-header-bg:  #1e293b;
+  --border-color:     rgba(51, 65, 85, 0.8);
+  --nav-bg:           rgba(15, 23, 42, 0.85);
+
+  --border: 1px solid var(--border-color);
+}
+
+/* ─── Global Reset & Styling ────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;                 /* Borders do not increase layout dimensions */
+  margin: 0;                             /* Remove browser default margins */
+  padding: 0;                            /* Remove browser default padding */
+}
+
+html {
+  font-size: 16px;                       /* Base REM dimension scale */
+  scroll-behavior: smooth;               /* Smooth anchor sliding */
+  -webkit-font-smoothing: antialiased;   /* Smooth layout font display in Chrome/Safari */
+  -moz-osx-font-smoothing: grayscale;    /* Smooth layout font display in Mac Firefox */
+}
+
+body {
+  font-family: var(--font-sans);          /* Apply default premium font family */
+  color: var(--gray-700);                 /* Neutral body text color */
+  background-color: var(--gray-100);       /* Soft neutral application background */
+  line-height: 1.6;                      /* Balanced line spacing */
+  min-height: 100vh;                     /* Make page fit screen height */
+  display: flex;                          /* Flex layout container */
+  flex-direction: column;                /* Arrange header, main, footer vertically */
+}
+
+/* ─── Typography & Headings ─────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;                      /* Bold headings */
+  line-height: 1.25;                     /* Tight heading line height */
+  color: var(--gray-900);                /* High contrast dark headings */
+  letter-spacing: -0.025em;              /* Sleek modern kerning */
+}
+
+h1 { font-size: 2.25rem; margin-bottom: var(--space-6); } /* Large page title */
+h2 { font-size: 1.75rem; margin-bottom: var(--space-4); } /* Section title */
+h3 { font-size: 1.35rem; margin-bottom: var(--space-3); } /* Card title */
+p { margin-bottom: var(--space-4); color: var(--gray-600); } /* Paragraph bottom margin */
+
+a {
+  color: var(--primary);                 /* Custom link color */
+  text-decoration: none;                 /* Remove default underlines */
+  transition: all var(--duration) var(--ease); /* Animate color changes */
+}
+
+a:hover {
+  color: var(--primary-dark);            /* Darken link on hover */
+}
+
+/* ─── Layout: Grid Container ────────────────────────────────── */
+.container {
+  width: 100%;                           /* Full-width wrapper */
+  max-width: var(--container-max);       /* Maximum centered width */
+  margin: 0 auto;                        /* Center in browser */
+  padding: 0 var(--space-6);             /* Edge padding for mobile layouts */
+}
+
+/* ─── Layout Grid Utilities ─────────────────────────────────── */
+.grid {
+  display: grid;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 992px) {
+  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ─── Navigation Header ──────────────────────────────────────── */
+.navbar {
+  position: sticky;                      /* Pin navigation bar to top of window */
+  top: 0;                                /* Stick location */
+  z-index: 1000;                         /* Ensure navigation floats above page elements */
+  height: var(--nav-height);             /* Set height */
+  background: var(--nav-bg);             /* Semi-transparent themed background */
+  backdrop-filter: blur(16px);           /* Premium glassmorphic blur background */
+  -webkit-backdrop-filter: blur(16px);   /* Safari blur support */
+  border-bottom: 1px solid var(--border-color); /* Themed border */
+  display: flex;                         /* Vertical centering flex */
+  align-items: center;                   /* Vertically align logo and menu */
+  box-shadow: var(--shadow-sm);          /* Small layout depth shadow */
+  transition: all var(--duration) var(--ease); /* Animate size/transparency alterations */
+}
+
+.navbar .container {
+  display: flex;                         /* Flex containment */
+  align-items: center;                   /* Center alignment */
+  justify-content: space-between;        /* Align logo on left, links on right */
+}
+
+.navbar-brand {
+  display: flex;                         /* Align icon and logo text */
+  align-items: center;                   /* Vertical centering */
+  gap: var(--space-2);                   /* Spacing between icon and brand text */
+  font-size: 1.5rem;                     /* Large brand font size */
+  font-weight: 800;                      /* Ultra-bold typography */
+  color: var(--gray-900);                /* High contrast dark text */
+  background: var(--grad-primary);        /* Gradient brand color mask */
+  -webkit-background-clip: text;         /* Clip gradient background to text shape */
+  -webkit-text-fill-color: transparent;  /* Transparent fill to render gradient mask */
+}
+
+.navbar-brand .logo-icon {
+  font-size: 1.75rem;                    /* Scale icon slightly larger than brand text */
+  filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.2)); /* Add shadow under the truck */
+}
+
+.nav-links {
+  display: flex;                         /* Render items horizontally */
+  align-items: center;                   /* Center items vertically */
+  gap: var(--space-6);                   /* Spacious menu gaps */
+  list-style: none;                      /* Remove list bullet points */
+}
+
+.nav-links a {
+  font-weight: 600;                      /* Medium font weight */
+  color: var(--gray-600);                /* Neutral link color */
+  padding: var(--space-2) var(--space-3); /* Clickable padded boundaries */
+  border-radius: var(--radius-md);       /* Soft corners */
+  transition: all var(--duration) var(--ease); /* Animate transitions */
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--primary);                 /* Active state color */
+  background-color: var(--primary-bg);   /* Soft blue highlighted background */
+}
+
+.nav-toggle {
+  display: none;                         /* Invisible by default on desktop viewports */
+  background: none;                      /* Remove button outline background */
+  border: none;                          /* Remove default borders */
+  font-size: 1.75rem;                    /* Large touch target font size */
+  cursor: pointer;                       /* Hand mouse icon */
+  color: var(--gray-800);                /* Neutral color */
+}
+
+/* Mobile responsive menu overrides */
+@media (max-width: 768px) {
+  .nav-toggle { display: block; }        /* Display menu button on tablets/phones */
+  .nav-links {
+    position: fixed;                     /* Position links relative to screen */
+    top: var(--nav-height);              /* Push menu content below sticky navbar */
+    left: 0;                             /* Expand to full width */
+    right: 0;                            /* Expand to full width */
+    flex-direction: column;              /* Stack menu links vertically */
+    background: var(--card-bg);          /* Themed background */
+    padding: var(--space-6);             /* Inside boundaries */
+    gap: var(--space-3);                 /* Spacing between vertical items */
+    border-bottom: var(--border);        /* Accent bottom boundary */
+    box-shadow: var(--shadow-xl);        /* Drop shadow overlaying the viewport */
+    transform: translateY(-150%);        /* Hide offscreen upwards */
+    opacity: 0;                          /* Invisible until toggled active */
+    pointer-events: none;                /* Block clicks while hidden */
+    transition: all 0.3s var(--ease);    /* Animate popup layout slide */
+  }
+  .nav-links.open {
+    transform: translateY(0);            /* Slide into view */
+    opacity: 1;                          /* Make menu links visible */
+    pointer-events: auto;                /* Enable links clicks */
+  }
+}
+
+/* ─── Buttons & CTA Styling ─────────────────────────────────── */
+.btn {
+  display: inline-flex;                  /* Horizontal centering of text and icons */
+  align-items: center;                   /* Center align vertically */
+  justify-content: center;               /* Center align horizontally */
+  gap: var(--space-2);                   /* Spacing between text and icon */
+  padding: var(--space-3) var(--space-6); /* Professional padding standard */
+  border: 2px solid transparent;          /* Hide border by default */
+  border-radius: var(--radius-md);       /* Soft corners */
+  font-family: var(--font-sans);          /* Keep font family consistent */
+  font-size: 0.95rem;                    /* Legible text size */
+  font-weight: 700;                      /* Bold button text */
+  cursor: pointer;                       /* Pointer hand cursor */
+  transition: all var(--duration) var(--ease); /* Smooth scale and hover states */
+  text-decoration: none;                 /* Clear underlines */
+  box-shadow: var(--shadow-sm);          /* Micro shadow depth */
+}
+
+.btn:hover {
+  transform: translateY(-2px);           /* Smooth hover upward lift */
+  box-shadow: var(--shadow-md);          /* Deepen shadow on lift */
+}
+
+.btn:active {
+  transform: translateY(0);              /* Press down on click */
+}
+
+.btn-primary {
+  background: var(--grad-primary);        /* Gradient brand fill */
+  color: white !important;                /* White contrast text */
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);              /* Lighten slightly on hover */
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); /* Electric blue drop glow */
+}
+
+.btn-accent {
+  background: var(--grad-accent);         /* Golden accent gradient */
+  color: white !important;                /* White contrast text */
+}
+
+.btn-accent:hover {
+  filter: brightness(1.05);              /* Lighten slightly on hover */
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); /* Golden drop glow */
+}
+
+.btn-outline {
+  background: transparent;                /* Empty transparent fill */
+  color: var(--primary);                 /* Brand blue text */
+  border-color: var(--primary);          /* Brand blue outline */
+}
+
+.btn-outline:hover {
+  background-color: var(--primary);      /* Fill background with brand blue on hover */
+  color: white !important;               /* Invert text to white */
+}
+
+.btn-danger {
+  background-color: var(--danger);       /* Red background */
+  color: white !important;               /* High contrast white text */
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;             /* Darker red variant */
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); /* Red alert drop glow */
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-4); /* Tight padding bounds */
+  font-size: 0.825rem;                   /* Slightly smaller text */
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-8); /* Bold, spacious button size */
+  font-size: 1.05rem;                    /* Hero-level text size */
+}
+
+.btn-block {
+  width: 100%;                           /* Expand button to full width of parent */
+}
+
+/* ─── Premium Cards & Grid Layouts ──────────────────────────── */
+.card {
+  background: var(--card-bg);            /* Themed content card */
+  border-radius: var(--radius-lg);       /* Soft curved layout corners */
+  border: 1px solid var(--border-color); /* Themed boundary stroke */
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  overflow: hidden;                      /* Keep zoomed card images within card bounds */
+  transition: all 0.4s var(--ease);      /* Fluid hover card movements */
+}
+
+.card:hover {
+  box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.08); /* Softer deep hover drop shadow */
+  transform: translateY(-4px);           /* Upward lift on hover */
+}
+
+.card-img-wrapper {
+  width: 100%;                           /* Standardize bounds */
+  height: 220px;                         /* Crop images to a uniform height */
+  overflow: hidden;                      /* Keep zoomed images from expanding */
+  background: var(--gray-100);           /* Fallback layout background */
+  position: relative;                    /* Enable child image overlay positioning */
+}
+
+.card-img {
+  width: 100%;                           /* Span full card container width */
+  height: 100%;                          /* Fill wrapper height */
+  object-fit: cover;                     /* Center crop scale behavior */
+  transition: transform 0.5s var(--ease); /* Animate smooth zoom transition */
+}
+
+.card:hover .card-img {
+  transform: scale(1.08);                /* Dynamic image zoom on hover */
+}
+
+.card-body {
+  padding: var(--space-5);               /* Cozy inner text boundaries */
+}
+
+.card-title {
+  font-size: 1.25rem;                    /* Medium bold titles */
+  font-weight: 700;                      /* Bold headings */
+  color: var(--gray-900);                /* High contrast text */
+  margin-bottom: var(--space-2);         /* Spacing below card header text */
+}
+
+.card-text {
+  color: var(--gray-500);                /* Subdued info text */
+  font-size: 0.925rem;                   /* Slightly smaller description text */
+  margin-bottom: var(--space-4);         /* Spacing below description */
+}
+
+/* ─── Interactive Forms & User Inputs ───────────────────────── */
+.form-group {
+  margin-bottom: var(--space-5);         /* Uniform spacing between stacked fields */
+}
+
+.form-label {
+  display: block;                        /* Stack label above input field */
+  margin-bottom: var(--space-2);         /* Spacing between label and input */
+  font-weight: 700;                      /* Bold labels for clarity */
+  font-size: 0.875rem;                   /* Standard form text size */
+  color: var(--gray-700);                /* Secondary layout color */
+}
+
+.form-control {
+  width: 100%;                           /* Expand input to match width of container */
+  padding: var(--space-3) var(--space-4); /* Professional input spacing padding */
+  border: 2px solid var(--gray-200);     /* Subtle border outline */
+  border-radius: var(--radius-md);       /* Curved inputs corners */
+  font-family: var(--font-sans);          /* Match application text */
+  font-size: 0.95rem;                    /* Comfortable reading size */
+  transition: all var(--duration) var(--ease); /* Animate glowing outlines */
+  background: var(--input-bg);           /* Themed input background */
+  color: var(--gray-800);                /* Themed readable text */
+}
+
+.form-control:focus {
+  outline: none;                         /* Remove browser default neon outlines */
+  border-color: var(--primary);          /* Highlight input with brand blue border */
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); /* Soft outer focus glow ring */
+  background-color: var(--input-bg);     /* Keep themed background */
+}
+
+/* Specific styling for select elements (Dropdown arrow) */
+select.form-control {
+  appearance: none;                      /* Remove default OS dropdown icons */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); /* Custom SVG caret */
+  background-repeat: no-repeat;          /* Do not repeat */
+  background-position: right 14px center;/* Align arrow on right edge */
+  padding-right: 42px;                   /* Ensure text does not overlay arrow */
+}
+
+textarea.form-control {
+  min-height: 120px;                     /* Give description area more height */
+  resize: vertical;                      /* Limit resize to vertical plane */
+}
+
+/* ─── Custom Tables Design ──────────────────────────────────── */
+.table-wrapper {
+  overflow-x: auto;                      /* Allow horizontal scrolling on small screens */
+  border-radius: var(--radius-lg);       /* Rounded container corners */
+  border: 1px solid var(--border-color); /* Themed structural outer border */
+  box-shadow: var(--shadow-sm);          /* soft table depth */
+  background: var(--card-bg);            /* Table card container base */
+  margin-bottom: var(--space-6);         /* Spacing underneath tables */
+}
+
+.table {
+  width: 100%;                           /* Expand table across wrapper width */
+  border-collapse: collapse;             /* Align border lines correctly */
+}
+
+.table th {
+  background: var(--table-header-bg);    /* Slightly distinct header row tint */
+  font-weight: 700;                      /* Bold headers */
+  font-size: 0.8rem;                     /* Small labels */
+  text-transform: uppercase;              /* Match dashboard standard */
+  letter-spacing: .05em;                 /* Airy letter kerning */
+  color: var(--gray-500);                /* Dim labels colors */
+  border-bottom: 2px solid var(--gray-200); /* Darker header separation line */
+}
+
+.table th, .table td {
+  padding: var(--space-4) var(--space-5); /* Spacious cells padding boundaries */
+  text-align: left;                      /* Align data left */
+  vertical-align: middle;                /* Center align contents vertically */
+}
+
+.table td {
+  border-bottom: 1px solid var(--gray-100); /* Thin layout separation line */
+  color: var(--gray-700);                /* Readable data text */
+  font-size: 0.95rem;                    /* Body standard text scale */
+}
+
+.table tbody tr:hover {
+  background-color: rgba(37, 99, 235, 0.02); /* Soft highlight on active rows */
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;                   /* Clear bottom line on final row */
+}
+
+/* ─── Hero Section with Modern Gradients ─────────────────────── */
+.hero {
+  background: var(--grad-primary);        /* Gradient background mask */
+  color: white;                          /* White contrasting text */
+  padding: var(--space-12) 0;            /* Tall top/bottom boundaries */
+  text-align: center;                    /* Center text headings */
+  position: relative;                    /* Enable absolute grid overlays */
+  overflow: hidden;                      /* Keep overlay shapes inside section */
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl); /* Rounded bottom edge */
+}
+
+/* Premium background pattern overlay */
+.hero::before {
+  content: '';                           /* Create empty layout node */
+  position: absolute;                    /* Absolute layout alignment */
+  top: 0; left: 0; right: 0; bottom: 0;  /* Fill section boundary completely */
+  background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(6,182,212,0.15) 0%, transparent 50%); /* Subtle glowing orbs */
+  z-index: 0;                            /* Position pattern underneath title text */
+}
+
+.hero-content {
+  position: relative;                    /* Lift content above background pattern */
+  z-index: 1;                            /* Layer priority index */
+}
+
+.hero h1 {
+  font-size: 3.25rem;                    /* Giant title font scale */
+  margin-bottom: var(--space-4);         /* spacing beneath title */
+  color: white;                          /* White heading */
+  font-weight: 800;                      /* Extra-bold headings weight */
+  letter-spacing: -0.03em;               /* Tight modern layout margins */
+}
+
+.hero p {
+  font-size: 1.25rem;                    /* Comfortable reading dimensions */
+  color: rgba(255, 255, 255, 0.9);       /* Clear contrasting white text */
+  max-width: 680px;                      /* Restrict text width to improve scanning */
+  margin: 0 auto var(--space-8);         /* Centered with bottom spacer */
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.25rem; }       /* Scale down hero headers on small screens */
+  .hero p { font-size: 1.05rem; }        /* Scale down hero paragraphs */
+}
+
+/* ─── Dashboard Sidebar Layouts ──────────────────────────────── */
+.navbar-dashboard {
+  transition: none;
+}
+
+@media (min-width: 769px) {
+  .navbar-dashboard {
+    position: fixed !important;
+    top: 0;
+    left: var(--sidebar-width) !important;
+    width: calc(100% - var(--sidebar-width)) !important;
+    z-index: 999;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .navbar-dashboard .navbar-brand {
+    display: none !important;
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+  }
+  .dashboard-main {
+    margin-top: var(--nav-height) !important;
+    padding: var(--space-8) !important; /* Spaced beautifully to the right of the sidebar */
+  }
+  .modal-backdrop {
+    left: var(--sidebar-width) !important;
+  }
+}
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--gray-50);
+  transition: background-color var(--duration) var(--ease);
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+    min-height: calc(100vh - var(--nav-height));
+  }
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  padding: var(--space-6) var(--space-4);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  transition: all var(--duration) var(--ease);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar-brand-wrapper {
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--space-5);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 1.35rem;
+  font-weight: 800;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sidebar-brand .logo-icon {
+  font-size: 1.5rem;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--gray-100);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--border-color);
+  transition: all var(--duration) var(--ease);
+}
+
+.sidebar-avatar {
+  font-size: 2rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar-user-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gray-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: var(--gray-500);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border-left: none;
+  transition: all var(--duration) var(--ease);
+}
+
+.sidebar-link i {
+  font-size: 1.05rem;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-link:hover {
+  color: var(--primary);
+  background: var(--gray-100);
+}
+
+.sidebar-link.active {
+  background: var(--grad-primary);
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: var(--space-4) 0;
+}
+
+.sidebar-logout {
+  color: var(--danger) !important;
+}
+
+.sidebar-logout:hover {
+  background: var(--danger-bg) !important;
+  color: var(--danger) !important;
+}
+
+.sidebar-controls {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-500);
+}
+
+.sidebar-lang a {
+  color: var(--gray-400);
+}
+
+.sidebar-lang a.active {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.sidebar-lang .divider {
+  color: var(--border-color);
+}
+
+.sidebar-theme-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  color: var(--gray-500);
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--duration) var(--ease);
+}
+
+.sidebar-theme-btn:hover {
+  color: var(--primary);
+}
+
+.dashboard-main {
+  flex: 1;                               /* Take up remaining width of dashboard */
+  padding: var(--space-8);               /* Generous spacing margins for content */
+  background-color: var(--gray-50);       /* Soft neutral body background */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;               /* Align all content next to the sidebar */
+  min-width: 0;                          /* Prevent flex items layout blowout */
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--nav-height));
+    z-index: 1001; /* Float above content and overlay */
+    background: var(--card-bg);
+    transform: translateX(-100%); /* Start completely off-screen left */
+    transition: transform 0.3s var(--ease);
+    display: flex !important; /* Ensure it overrides display: none */
+    padding: var(--space-6) var(--space-4);
+    box-shadow: var(--shadow-xl);
+    border-right: 1px solid var(--border-color);
+  }
+  .sidebar.open {
+    transform: translateX(0); /* Slide into view */
+  }
+  .sidebar-brand-wrapper { display: none; }
+  .dashboard-main {
+    height: auto;
+    padding: var(--space-6) var(--space-4);
+  }
+  
+  /* Add dark backdrop overlay class */
+  .sidebar-overlay {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease);
+  }
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ─── Semantic Messaging Alert Boxes ───────────────────────── */
+.alert {
+  padding: var(--space-4) var(--space-5); /* Professional layout margins padding */
+  border-radius: var(--radius-md);       /* Soft curved outline corners */
+  margin-bottom: var(--space-6);         /* Spacing beneath alerts */
+  font-size: 0.95rem;                    /* Reading text standard */
+  font-weight: 600;                      /* Semi-bold fonts for warnings */
+  display: flex;                         /* Place warning symbol and text inline */
+  align-items: center;                   /* Center items vertically */
+  gap: var(--space-3);                   /* Spacing gap */
+  animation: slideDown 0.4s var(--ease);  /* Animate dropdown entry onto page */
+  box-shadow: var(--shadow-sm);          /* Micro shadow depth */
+  border: 1px solid var(--border-color);
+}
+
+.alert-success { background: var(--success-bg); color: #065f46; border-left: 4px solid var(--success); }
+.alert-error   { background: var(--danger-bg);  color: #991b1b; border-left: 4px solid var(--danger); }
+.alert-warning { background: var(--warning-bg); color: #92400e; border-left: 4px solid var(--warning); }
+.alert-info    { background: var(--info-bg);    color: #1e40af; border-left: 4px solid var(--info); }
+
+[data-theme="dark"] .alert-success { color: #34d399; }
+[data-theme="dark"] .alert-error   { color: #fca5a5; }
+[data-theme="dark"] .alert-warning { color: #fcd34d; }
+[data-theme="dark"] .alert-info    { color: #93c5fd; }
+
+#flash-alert {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  min-width: 320px;
+  max-width: 450px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-xl);
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); } /* Fade and slide downwards */
+  to { opacity: 1; transform: translateY(0); }     /* End at baseline positions */
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ─── Semantic Badge / Status Indicators ────────────────────── */
+.badge {
+  display: inline-flex;                  /* Keep inline flow shape */
+  align-items: center;                   /* Center badge contents vertically */
+  padding: 3px 12px;                     /* Balanced margins */
+  border-radius: var(--radius-full);     /* Circle pill contours */
+  font-size: 0.75rem;                    /* Clean small label size */
+  font-weight: 700;                      /* Bold badge label text */
+  text-transform: uppercase;              /* Match status standards */
+  letter-spacing: .05em;                 /* Wide letter format */
+  box-shadow: var(--shadow-sm);          /* Micro depth shadow */
+}
+
+.status-pending   { background: var(--warning-bg); color: #b45309; }
+.status-accepted  { background: var(--info-bg);    color: #1d4ed8; }
+.status-transit,
+.status-in_transit { background: #f0f9ff;           color: #0369a1; }
+.status-completed { background: var(--success-bg); color: #047857; }
+.status-cancelled { background: var(--danger-bg);  color: #b91c1c; }
+.status-approved  { background: var(--success-bg); color: #047857; }
+.status-rejected  { background: var(--danger-bg);  color: #b91c1c; }
+
+/* ─── Custom Star Rating Display ────────────────────────────── */
+.stars {
+  color: var(--accent);                  /* Color stars golden amber */
+  font-size: 1rem;                       /* Standard size */
+  letter-spacing: 2px;                   /* Gap between star icons */
+}
+
+.stars .star-empty {
+  color: var(--gray-300);                /* Inactive stars gray colour */
+}
+
+/* ─── Stats Displays Cards ──────────────────────────────────── */
+.stat-card {
+  background: var(--card-bg);            /* Themed backing card */
+  border-radius: var(--radius-lg);       /* Rounded outline corners */
+  padding: var(--space-6);               /* Cozy inner spacing borders */
+  border: 1px solid var(--border-color);  /* Themed structural outer border */
+  text-align: center;                    /* Center alignment */
+  box-shadow: var(--shadow-sm);          /* Micro shadow depth */
+  transition: all var(--duration) var(--ease); /* Animate hover elevation */
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);           /* Lift stats slightly on hover */
+  box-shadow: var(--shadow-md);          /* Deeper depth layout shadow */
+  border-color: var(--primary-light);    /* Tint card border with brand blue tint */
+}
+
+.stat-card .stat-value {
+  font-size: 2.25rem;                    /* Massive visible value font weight */
+  font-weight: 800;                      /* Ultra-bold text */
+  background: var(--grad-primary);        /* Gradient value fill */
+  -webkit-background-clip: text;         /* Clip gradient to value text shape */
+  -webkit-text-fill-color: transparent;  /* Render value gradient mask */
+  margin-bottom: var(--space-1);         /* Spacing below value */
+}
+
+.stat-card .stat-label {
+  font-size: 0.875rem;                   /* Standard description scale */
+  color: var(--gray-500);                /* Muted text description color */
+  font-weight: 600;                      /* Semi-bold text */
+  text-transform: uppercase;              /* Label layout format */
+  letter-spacing: 0.05em;                /* Wider letters spacing */
+}
+
+/* ─── Application Footer ────────────────────────────────────── */
+.footer {
+  background-color: var(--gray-900);      /* Slate dark backing footer */
+  color: var(--gray-400);                 /* Light neutral description color */
+  padding: var(--space-12) 0 var(--space-8); /* Deep margins top/bottom padding */
+  margin-top: auto;                      /* Push footer to bottom edge of page */
+  border-top: 1px solid rgba(255, 255, 255, 0.04); /* Subtle top division line */
+}
+
+.footer h3, .footer h4 {
+  color: white !important;               /* Clear white contrasting headings */
+  margin-bottom: var(--space-4);         /* spacing below heading */
+}
+
+.footer a {
+  color: var(--gray-400);                 /* Light neutral link color */
+}
+
+.footer a:hover {
+  color: white;                          /* Highlight active link white on hover */
+}
+
+.footer-grid {
+  display: grid;                         /* Grid alignment layout */
+  grid-template-columns: 2fr 1fr 1fr 1fr; /* Set column distributions */
+  gap: var(--space-8);                   /* grid alignment gaps spacing */
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* Division line separation */
+  margin-top: var(--space-8);            /* spacing */
+  padding-top: var(--space-6);           /* Spacing padding */
+  text-align: center;                    /* Center copy copyright label */
+  font-size: 0.85rem;                    /* clean text scale */
+  color: var(--gray-500);                /* Muted copy text color */
+}
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr; } /* Stack footer columns on mobile viewports */
+}
+
+/* ─── Modern Custom Scrollbar ───────────────────────────────── */
+::-webkit-scrollbar {
+  width: 10px;                           /* Width of vertical track scrollbar */
+  height: 10px;                          /* Height of horizontal track scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-50);             /* Scroll track background color */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);           /* scroll track handle color */
+  border-radius: var(--radius-full);     /* Circle curved handle track edges */
+  border: 2px solid var(--gray-50);      /* Outer margin around handle track */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);           /* Darken handle on hover states */
+}
+
+/* ─── CSS Utility Classes ───────────────────────────────────── */
+.text-center { text-align: center; }     /* Center aligning class */
+.text-right { text-align: right; }       /* Right aligning class */
+.text-sm { font-size: 0.85rem; }         /* Small text layout helper */
+.text-lg { font-size: 1.15rem; }         /* Large text layout helper */
+.text-primary { color: var(--primary); } /* Highlight text with brand color */
+.text-muted { color: var(--gray-500); }   /* Highlight text with muted color */
+.text-success { color: var(--success); } /* Success semantic text helper */
+.text-danger { color: var(--danger); }   /* Danger semantic text helper */
+.text-warning { color: var(--warning); } /* Warning semantic text helper */
+.font-bold { font-weight: 700; }         /* Bold weight text helper */
+.flex { display: flex; }                 /* Flex layout helper class */
+.flex-col { flex-direction: column; }     /* Vertical stacking flex helper */
+.items-center { align-items: center; }   /* Vertical alignment helper */
+.justify-between { justify-content: space-between; } /* Edge separation helper */
+.gap-2 { gap: var(--space-2); }         /* Spacing gap helpers */
+.gap-4 { gap: var(--space-4); }         /* Spacing gap helpers */
+.gap-6 { gap: var(--space-6); }         /* Spacing gap helpers */
+.hidden { display: none; }               /* Hide elements helper */
+.w-full { width: 100%; }                 /* Make elements span full container */
+.p-6 { padding: var(--space-6); }       /* Uniform padding box model */
+.mb-2 { margin-bottom: var(--space-2); } /* Uniform margin layout box model */
+.mb-4 { margin-bottom: var(--space-4); } /* Uniform margin layout box model */
+.mb-6 { margin-bottom: var(--space-6); } /* Uniform margin layout box model */
+.mb-8 { margin-bottom: var(--space-8); } /* Uniform margin layout box model */
+.mt-4 { margin-top: var(--space-4); }    /* Uniform margin layout box model */
+.mt-6 { margin-top: var(--space-6); }    /* Uniform margin layout box model */
+.mt-8 { margin-top: var(--space-8); }    /* Uniform margin layout box model */
+
+/* ─── Horizontal Cards Layout ────────────────────────────── */
+.card-horizontal {
+  display: flex;
+  flex-direction: row;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s var(--ease);
+  margin-bottom: var(--space-6);
+}
+
+.card-horizontal:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.card-horizontal .card-img-wrapper {
+  width: 280px;
+  height: auto;
+  min-height: 200px;
+  flex-shrink: 0;
+}
+
+.card-horizontal .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-6);
+}
+
+.card-horizontal .card-content-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.card-horizontal .card-content-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--gray-100);
+  padding-top: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .card-horizontal {
+    flex-direction: column;
+  }
+  .card-horizontal .card-img-wrapper {
+    width: 100%;
+    height: 200px;
+  }
+  .card-horizontal .card-content-top,
+  .card-horizontal .card-content-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+  .card-horizontal .card-content-bottom {
+    width: 100%;
+  }
+}
+
+/* ─── Auth Layout and Pages ───────────────────────────────── */
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--nav-height) - 100px);
+  background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.04) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+              var(--gray-50);
+  padding: var(--space-8) var(--space-4);
+}
+
+.auth-card {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xl);
+  transition: all 0.3s var(--ease);
+}
+
+.auth-card:hover {
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.auth-card h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: var(--space-2);
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-card .divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--gray-400);
+  font-size: 0.85rem;
+  margin: var(--space-6) 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-card .divider::before,
+.auth-card .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.auth-card .divider:not(:empty)::before {
+  margin-right: var(--space-4);
+}
+
+.auth-card .divider:not(:empty)::after {
+  margin-left: var(--space-4);
+}
+
+.form-hint {
+  display: block;
+  font-size: 0.775rem;
+  color: var(--gray-500);
+  margin-top: var(--space-1);
+}
+
+/* ─── Responsive Grid Layouts ────────────────────────────── */
+.responsive-grid-detail {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.responsive-grid-equal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.responsive-grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .responsive-grid-detail,
+  .responsive-grid-equal,
+  .responsive-grid-2-1 {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* Premium hover micro-interaction for sidebar links */
+.sidebar-link i {
+  transition: transform var(--duration) var(--ease);
+}
+.sidebar-link:hover i {
+  transform: scale(1.15) translateX(3px);
+}
+
+/* Align dashboard contents closer to the sidebar instead of being centered on desktop */
+@media (min-width: 769px) {
+  .dashboard-main > * {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    max-width: 1400px !important;
+    width: 100% !important;
+  }
+}
+
+/* Premium curved and modern SweetAlert2 styling overrides */
+.swal2-popup {
+  border-radius: var(--radius-lg) !important;
+  font-family: var(--font-sans) !important;
+  background: var(--card-bg) !important;
+  color: var(--gray-700) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+.swal2-title {
+  color: var(--gray-900) !important;
+  font-weight: 700 !important;
+}
+.swal2-html-container {
+  color: var(--gray-500) !important;
+}
+.swal2-actions {
+  gap: var(--space-3) !important;
+}
+.swal2-confirm {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 24px !important;
+  font-weight: 600 !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all var(--duration) var(--ease) !important;
+}
+.swal2-confirm:hover {
+  background-color: var(--primary-dark) !important;
+}
+.swal2-cancel {
+  background-color: transparent !important;
+  color: var(--gray-500) !important;
+  border: 1px solid var(--gray-300) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 8px 24px !important;
+  font-weight: 600 !important;
+  transition: all var(--duration) var(--ease) !important;
+}
+.swal2-cancel:hover {
+  background-color: var(--gray-100) !important;
+  color: var(--gray-800) !important;
+}
+
+/* Customized Premium Thin Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+/* =============================================================
+   Premium Pagination Component
+   ============================================================= */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--card-bg);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--duration) var(--ease);
+}
+
+.pagination-link:hover {
+  background: var(--gray-100);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.pagination-link.active {
+  background: var(--grad-primary);
+  color: white !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.pagination-link.disabled {
+  color: var(--gray-300);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.pagination-link.nav-btn {
+  gap: 6px;
+  padding: 0 var(--space-3);
+}
+
