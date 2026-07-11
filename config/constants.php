@@ -69,6 +69,7 @@ define('PAYMENT_METHODS', [
     'halotel'=> ['en' => 'Halotel',     'sw' => 'Halotel'],
     'card'   => ['en' => 'Bank Card',   'sw' => 'Kadi ya Benki'],
     'cash'   => ['en' => 'Cash',        'sw' => 'Pesa Taslimu'],
+    'wallet' => ['en' => 'My Wallet',   'sw' => 'Pochi Yangu'],
 ]);
 
 // ─── Max file upload size (2MB per image) ─────────────────────

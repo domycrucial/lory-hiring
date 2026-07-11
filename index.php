@@ -140,6 +140,9 @@ $routes = [
     'POST:payments/checkout'          => ['PaymentController',      'checkout'],
     'GET:payments/success'            => ['PaymentController',      'success'],
     'GET:payments/history'            => ['PaymentController',      'history'],
+    'GET:api/v1/wallet/balance'       => ['PaymentController',      'apiBalance'],
+    'POST:api/v1/wallet/deposit'      => ['PaymentController',      'apiDeposit'],
+    'POST:api/v1/payments/checkout-ajax' => ['PaymentController',   'checkoutAjax'],
 
     // ── Dashboard ─────────────────────────────────────────────
     'GET:dashboard/customer'          => ['HomeController',         'customerDashboard'],

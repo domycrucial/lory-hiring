@@ -101,11 +101,13 @@ class Booking extends BaseModel
     {
         $sql    = "SELECT b.*, l.name AS lorry_name, l.lorry_type, l.plate_number,
                           o.full_name AS owner_name, o.phone AS owner_phone,
-                          p.photo_path AS lorry_photo
+                          p.photo_path AS lorry_photo,
+                          pay.status AS payment_status, pay.transaction_id
                    FROM bookings b
                    INNER JOIN lorries l ON l.id = b.lorry_id
                    INNER JOIN users o ON o.id = l.owner_id
                    LEFT JOIN lorry_photos p ON p.lorry_id = l.id AND p.is_primary = 1
+                   LEFT JOIN payments pay ON pay.booking_id = b.id AND pay.status = 'completed'
                    WHERE b.customer_id = :customer_id";
         $params = [':customer_id' => $customerId];
 
@@ -132,11 +134,13 @@ class Booking extends BaseModel
     {
         $sql    = "SELECT b.*, l.name AS lorry_name, l.lorry_type,
                           u.full_name AS customer_name, u.phone AS customer_phone,
-                          p.photo_path AS lorry_photo
+                          p.photo_path AS lorry_photo,
+                          pay.status AS payment_status, pay.transaction_id
                    FROM bookings b
                    INNER JOIN lorries l ON l.id = b.lorry_id
                    INNER JOIN users u ON u.id = b.customer_id
                    LEFT JOIN lorry_photos p ON p.lorry_id = l.id AND p.is_primary = 1
+                   LEFT JOIN payments pay ON pay.booking_id = b.id AND pay.status = 'completed'
                    WHERE (b.status = 'pending' OR l.owner_id = :owner_id)";
         $params = [':owner_id' => $ownerId];
 
@@ -278,6 +282,14 @@ class Booking extends BaseModel
     {
         try {
             $this->db->beginTransaction();
+
+            // Verify that booking has been paid
+            $payStmt = $this->db->prepare("SELECT id FROM payments WHERE booking_id = :booking_id AND status = 'completed'");
+            $payStmt->execute([':booking_id' => $bookingId]);
+            if ($payStmt->rowCount() === 0) {
+                $this->db->rollBack();
+                return false; // Cannot start trip without payment
+            }
 
             $sql  = "UPDATE bookings b
                      INNER JOIN lorries l ON l.id = b.lorry_id AND l.owner_id = :owner_id

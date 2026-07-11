@@ -92,6 +92,26 @@ class Payment extends BaseModel
     }
 
     /**
+     * Get full payout history for a lorry owner with customer and booking details.
+     *
+     * @param int $ownerId
+     * @return array
+     */
+    public function getOwnerHistory(int $ownerId): array
+    {
+        $sql = "SELECT p.*, b.booking_ref, u.full_name AS customer_name, u.phone AS customer_phone,
+                       l.name AS lorry_name
+                FROM payments p
+                INNER JOIN bookings b ON b.id = p.booking_id
+                INNER JOIN lorries l ON l.id = b.lorry_id
+                INNER JOIN users u ON u.id = b.customer_id
+                WHERE l.owner_id = :owner_id
+                ORDER BY p.created_at DESC";
+
+        return $this->rawQuery($sql, [':owner_id' => $ownerId]);
+    }
+
+    /**
      * Get total earnings and commission for a lorry owner.
      *
      * @param int $ownerId

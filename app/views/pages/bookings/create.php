@@ -16,13 +16,19 @@
                 <!-- Input for pickup location -->
                 <div class="form-group">
                     <label class="form-label" for="pickup_address"><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Pickup Address</label>
-                    <input type="text" name="pickup_address" id="pickup_address" class="form-control" placeholder="e.g. Kariakoo Market, Dar es Salaam" required>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" name="pickup_address" id="pickup_address" class="form-control" placeholder="e.g. Kariakoo Market, Dar es Salaam" required style="flex: 1;">
+                        <button type="button" id="btn-pick-map" class="btn btn-outline" style="display: flex; align-items: center; gap: 6px; padding: 0 16px;" title="Pin location on map"><i class="fa-solid fa-map-pin"></i> Pin</button>
+                    </div>
                 </div>
 
                 <!-- Input for delivery destination -->
                 <div class="form-group">
                     <label class="form-label" for="delivery_address"><i class="fa-solid fa-location-crosshairs" style="color: var(--primary);"></i> Delivery Address</label>
-                    <input type="text" name="delivery_address" id="delivery_address" class="form-control" placeholder="e.g. Arusha Central" required>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" name="delivery_address" id="delivery_address" class="form-control" placeholder="e.g. Arusha Central" required style="flex: 1;">
+                        <button type="button" id="btn-deliver-map" class="btn btn-outline" style="display: flex; align-items: center; gap: 6px; padding: 0 16px;" title="Pin location on map"><i class="fa-solid fa-map-pin"></i> Pin</button>
+                    </div>
                 </div>
 
                 <!-- Input for goods contents -->
@@ -58,8 +64,12 @@
                     </div>
                 </div>
 
-                <!-- Route Map display -->
-                <div id="bookingRouteMap" style="height: 220px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: var(--space-4); display: none; z-index: 1;"></div>
+                <!-- Route Map display and instructions -->
+                <div id="mapInstructions" style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: var(--space-2); background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-circle-info text-primary"></i>
+                    <span><strong>Tip:</strong> Click "Pin" next to an input then click on the map to set location, or drag markers to update the route!</span>
+                </div>
+                <div id="bookingRouteMap" style="height: 350px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: var(--space-4); z-index: 1;"></div>
 
                 <!-- Confirm submit button -->
                 <button type="submit" class="btn btn-accent btn-lg btn-block"><i class="fa-solid fa-circle-check"></i> Confirm Booking</button>
@@ -101,13 +111,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tanzaniaLocations = {
-        "dar es salaam": [-6.7924, 39.2083],
-        "dar": [-6.7924, 39.2083],
         "kariakoo": [-6.8163, 39.2755],
         "kigamboni": [-6.8277, 39.3175],
         "ubungo": [-6.7887, 39.2083],
         "temeke": [-6.8524, 39.2678],
         "kinondoni": [-6.7824, 39.2244],
+        "dar es salaam": [-6.7924, 39.2083],
+        "dar": [-6.7924, 39.2083],
         "dodoma": [-6.1731, 35.7419],
         "arusha": [-3.3869, 36.6830],
         "mwanza": [-2.5183, 32.9003],
@@ -148,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function geocodeAddress(address) {
         if (!address || address.trim().length < 3) return null;
-        // Limit query to Tanzania (tz) to ensure relevant results
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=tz&limit=1`;
         try {
             const res = await fetch(url, { headers: { 'Accept-Language': 'sw,en' } });
@@ -169,10 +178,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const durationEl = document.getElementById('duration-estimate');
     const rate = <?= (float)($lorry['price_per_km'] ?? 0) ?>;
 
+    const btnPick = document.getElementById('btn-pick-map');
+    const btnDeliver = document.getElementById('btn-deliver-map');
+
     let map = null;
     let routePolyline = null;
     let startMarker = null;
     let endMarker = null;
+    let startCoords = null;
+    let endCoords = null;
+    let pinMode = null; // 'pickup' or 'delivery'
+
+    // Initialize map immediately centered on the lorry's location or Dar es Salaam
+    const lorryLat = <?= (float)($lorry['latitude'] ?? -6.7924) ?>;
+    const lorryLon = <?= (float)($lorry['longitude'] ?? 39.2083) ?>;
+    map = L.map('bookingRouteMap').setView([lorryLat, lorryLon], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Green FontAwesome Icon for pickup marker
+    const greenIcon = L.divIcon({
+        html: '<i class="fa-solid fa-location-dot fa-2x" style="color: #10b981; text-shadow: 0 1px 3px rgba(0,0,0,0.3);"></i>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24],
+        className: 'custom-map-icon-pickup'
+    });
+
+    // Red FontAwesome Icon for delivery marker
+    const redIcon = L.divIcon({
+        html: '<i class="fa-solid fa-location-dot fa-2x" style="color: #ef4444; text-shadow: 0 1px 3px rgba(0,0,0,0.3);"></i>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24],
+        className: 'custom-map-icon-delivery'
+    });
 
     function formatDurationJS(seconds) {
         const hours = Math.floor(seconds / 3600);
@@ -187,79 +228,223 @@ document.addEventListener('DOMContentLoaded', function() {
         return parts.join(", ");
     }
 
-    async function calculateRoute() {
-        const pVal = pickupInput.value;
-        const dVal = deliveryInput.value;
-        if (!pVal || !dVal) return;
+    function updateMarkers() {
+        if (startCoords) {
+            if (!startMarker) {
+                startMarker = L.marker(startCoords, { icon: greenIcon, draggable: true }).addTo(map);
+                startMarker.bindPopup('<b>Pickup / Pa Kuchukulia</b><br>Drag me to change location.');
+                startMarker.on('dragend', function(e) {
+                    const latlng = e.target.getLatLng();
+                    startCoords = [latlng.lat, latlng.lng];
+                    pickupInput.value = `📍 Map Location (${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)})`;
+                    updateRoute();
+                });
+            } else {
+                startMarker.setLatLng(startCoords);
+            }
+        } else if (startMarker) {
+            map.removeLayer(startMarker);
+            startMarker = null;
+        }
 
-        priceEl.innerHTML = '<span class="text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Geocoding...</span>';
-        durationEl.innerHTML = '<span class="text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Geocoding...</span>';
+        if (endCoords) {
+            if (!endMarker) {
+                endMarker = L.marker(endCoords, { icon: redIcon, draggable: true }).addTo(map);
+                endMarker.bindPopup('<b>Delivery / Mahali pa Kupeleka</b><br>Drag me to change location.');
+                endMarker.on('dragend', function(e) {
+                    const latlng = e.target.getLatLng();
+                    endCoords = [latlng.lat, latlng.lng];
+                    deliveryInput.value = `📍 Map Location (${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)})`;
+                    updateRoute();
+                });
+            } else {
+                endMarker.setLatLng(endCoords);
+            }
+        } else if (endMarker) {
+            map.removeLayer(endMarker);
+            endMarker = null;
+        }
+    }
 
-        let start = await geocodeAddress(pVal);
-        let end = await geocodeAddress(dVal);
+    async function updateRoute() {
+        if (!startCoords || !endCoords) return;
 
-        // Fallback to dictionary
-        if (!start) start = getCoords(pVal) || [-6.7924, 39.2083];
-        if (!end) end = getCoords(dVal) || [-3.3869, 36.6830];
+        priceEl.innerHTML = '<span class="text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Calculating route...</span>';
+        durationEl.innerHTML = '<span class="text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Calculating route...</span>';
 
-        // Query OSRM API for driving routing
-        const osrmUrl = `https://router.projectosrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+        const osrmUrl = `https://router.projectosrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson`;
 
-        fetch(osrmUrl)
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 'Ok' && data.routes && data.routes[0]) {
-                    const route = data.routes[0];
-                    const distanceKm = (route.distance / 1000).toFixed(1);
-                    const durationSec = route.duration;
-
-                    distInput.value = distanceKm;
-                    priceEl.innerHTML = '<strong>' + (distanceKm * rate).toLocaleString() + ' TZS</strong>';
-                    durationEl.innerHTML = '<strong>' + formatDurationJS(durationSec) + '</strong>';
-
-                    // Initialize map
-                    const mapDiv = document.getElementById('bookingRouteMap');
-                    mapDiv.style.display = 'block';
-                    if (!map) {
-                        map = L.map('bookingRouteMap');
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                    }
-
-                    // Reset layers
-                    if (routePolyline) map.removeLayer(routePolyline);
-                    if (startMarker) map.removeLayer(startMarker);
-                    if (endMarker) map.removeLayer(endMarker);
-
-                    startMarker = L.circleMarker(start, { radius: 6, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 1 }).addTo(map).bindPopup('Pickup: ' + pVal);
-                    endMarker = L.circleMarker(end, { radius: 6, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1 }).addTo(map).bindPopup('Delivery: ' + dVal);
-                    
-                    const geojsonLayer = L.geoJSON(route.geometry, {
-                        style: { color: '#2563eb', weight: 4, opacity: 0.8 }
-                    });
-                    routePolyline = geojsonLayer.addTo(map);
-
-                    map.fitBounds(routePolyline.getBounds(), { padding: [20, 20] });
-                }
-            })
-            .catch(err => {
-                // Fallback Haversine straight line if OSRM is offline
-                const r = 6371;
-                const dLat = (end[0] - start[0]) * Math.PI / 180;
-                const dLng = (end[1] - start[1]) * Math.PI / 180;
-                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                          Math.cos(start[0]*Math.PI/180) * Math.cos(end[0]*Math.PI/180) *
-                          Math.sin(dLng/2) * Math.sin(dLng/2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                const distanceKm = (r * c * 1.3).toFixed(1);
-                const durationSec = (distanceKm / 55) * 3600;
+        try {
+            const res = await fetch(osrmUrl);
+            const data = await res.json();
+            if (data.code === 'Ok' && data.routes && data.routes[0]) {
+                const route = data.routes[0];
+                const distanceKm = (route.distance / 1000).toFixed(1);
+                const durationSec = route.duration;
 
                 distInput.value = distanceKm;
                 priceEl.innerHTML = '<strong>' + (distanceKm * rate).toLocaleString() + ' TZS</strong>';
                 durationEl.innerHTML = '<strong>' + formatDurationJS(durationSec) + '</strong>';
-            });
+
+                if (routePolyline) map.removeLayer(routePolyline);
+                
+                const geojsonLayer = L.geoJSON(route.geometry, {
+                    style: { color: '#2563eb', weight: 4, opacity: 0.8 }
+                });
+                routePolyline = geojsonLayer.addTo(map);
+
+                updateMarkers();
+                map.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
+            } else {
+                throw new Error("OSRM routing failed");
+            }
+        } catch (err) {
+            console.error("OSRM error, falling back to Haversine straight line:", err);
+            const r = 6371;
+            const dLat = (endCoords[0] - startCoords[0]) * Math.PI / 180;
+            const dLng = (endCoords[1] - startCoords[1]) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(startCoords[0]*Math.PI/180) * Math.cos(endCoords[0]*Math.PI/180) *
+                      Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distanceKm = (r * c * 1.3).toFixed(1);
+            const durationSec = (distanceKm / 55) * 3600;
+
+            distInput.value = distanceKm;
+            priceEl.innerHTML = '<strong>' + (distanceKm * rate).toLocaleString() + ' TZS</strong>';
+            durationEl.innerHTML = '<strong>' + formatDurationJS(durationSec) + '</strong>';
+
+            if (routePolyline) map.removeLayer(routePolyline);
+            routePolyline = L.polyline([startCoords, endCoords], { color: '#ef4444', weight: 4, dashArray: '5, 10', opacity: 0.8 }).addTo(map);
+            
+            updateMarkers();
+            map.fitBounds(routePolyline.getBounds(), { padding: [40, 40] });
+        }
     }
 
-    pickupInput.addEventListener('blur', calculateRoute);
-    deliveryInput.addEventListener('blur', calculateRoute);
+    async function handleTextInputChange() {
+        const pVal = pickupInput.value.trim();
+        const dVal = deliveryInput.value.trim();
+        
+        let changed = false;
+
+        if (pVal && !pVal.startsWith('📍')) {
+            let start = await geocodeAddress(pVal);
+            if (!start) start = getCoords(pVal);
+            if (start) {
+                startCoords = start;
+                changed = true;
+            }
+        }
+
+        if (dVal && !dVal.startsWith('📍')) {
+            let end = await geocodeAddress(dVal);
+            if (!end) end = getCoords(dVal);
+            if (end) {
+                endCoords = end;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            updateMarkers();
+            if (startCoords && endCoords) {
+                updateRoute();
+            } else if (startCoords) {
+                map.setView(startCoords, 10);
+            } else if (endCoords) {
+                map.setView(endCoords, 10);
+            }
+        }
+    }
+
+    pickupInput.addEventListener('blur', handleTextInputChange);
+    deliveryInput.addEventListener('blur', handleTextInputChange);
+
+    // Map pinning controls
+    btnPick.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pinMode === 'pickup') {
+            resetPinMode();
+        } else {
+            setPinMode('pickup');
+        }
+    });
+
+    btnDeliver.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (pinMode === 'delivery') {
+            resetPinMode();
+        } else {
+            setPinMode('delivery');
+        }
+    });
+
+    function setPinMode(mode) {
+        resetPinMode();
+        pinMode = mode;
+        const mapDiv = document.getElementById('bookingRouteMap');
+        mapDiv.style.cursor = 'crosshair';
+        
+        if (mode === 'pickup') {
+            btnPick.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Click Map';
+            btnPick.classList.remove('btn-outline');
+            btnPick.classList.add('btn-accent');
+        } else {
+            btnDeliver.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Click Map';
+            btnDeliver.classList.remove('btn-outline');
+            btnDeliver.classList.add('btn-accent');
+        }
+    }
+
+    function resetPinMode() {
+        pinMode = null;
+        const mapDiv = document.getElementById('bookingRouteMap');
+        mapDiv.style.cursor = '';
+        
+        btnPick.innerHTML = '<i class="fa-solid fa-map-pin"></i> Pin';
+        btnPick.classList.remove('btn-accent');
+        btnPick.classList.add('btn-outline');
+
+        btnDeliver.innerHTML = '<i class="fa-solid fa-map-pin"></i> Pin';
+        btnDeliver.classList.remove('btn-accent');
+        btnDeliver.classList.add('btn-outline');
+    }
+
+    map.on('click', function(e) {
+        if (!pinMode) return;
+        
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        if (pinMode === 'pickup') {
+            startCoords = [lat, lng];
+            pickupInput.value = `📍 Map Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+        } else if (pinMode === 'delivery') {
+            endCoords = [lat, lng];
+            deliveryInput.value = `📍 Map Location (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+        }
+        
+        resetPinMode();
+        updateMarkers();
+        
+        if (startCoords && endCoords) {
+            updateRoute();
+        } else if (startCoords) {
+            map.panTo(startCoords);
+        } else if (endCoords) {
+            map.panTo(endCoords);
+        }
+    });
+
+    // Form submit validation
+    const form = document.getElementById('booking-form');
+    form.addEventListener('submit', function(e) {
+        const distance = parseFloat(distInput.value);
+        if (!distance || distance <= 0) {
+            e.preventDefault();
+            alert("Please calculate the distance by selecting valid pickup and delivery locations first. / Tafadhali chagua maeneo sahihi ya kuchukua na kupeleka mzigo kwanza.");
+        }
+    });
 });
 </script>

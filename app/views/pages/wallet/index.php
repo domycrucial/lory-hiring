@@ -20,7 +20,7 @@
     <div class="card p-6">
         <div class="text-xs uppercase tracking-wider text-muted mb-2">Platform Commission Paid</div>
         <div class="text-2xl font-bold text-danger mb-4"><?= formatTZS($earnings['commission_paid'] ?? 0) ?></div>
-        <div class="text-xs text-muted"><i class="fa-solid fa-percent"></i> 8% standard commission fee.</div>
+        <div class="text-xs text-muted"><i class="fa-solid fa-percent"></i> <?= COMMISSION_RATE ?>% standard commission fee.</div>
     </div>
 </div>
 
@@ -88,3 +88,33 @@
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form[action$="/wallet/withdraw"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const amountInput = document.getElementById('withdraw_amount');
+            const phoneInput = document.getElementById('withdraw_phone');
+            const amount = parseFloat(amountInput.value);
+            const phone = phoneInput.value.trim();
+
+            Swal.fire({
+                title: 'Confirm Withdrawal / Thibitisha Kutoa Pesa',
+                html: `Are you sure you want to withdraw <strong>${Number(amount).toLocaleString()} TZS</strong> to mobile money number <strong>${phone}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Yes, Submit Request',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+</script>

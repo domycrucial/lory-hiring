@@ -118,13 +118,13 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     // Tanzania Location Database for instant matching
     const tanzaniaLocations = {
-        "dar es salaam": [-6.7924, 39.2083],
-        "dar": [-6.7924, 39.2083],
         "kariakoo": [-6.8163, 39.2755],
         "kigamboni": [-6.8277, 39.3175],
         "ubungo": [-6.7887, 39.2083],
         "temeke": [-6.8524, 39.2678],
         "kinondoni": [-6.7824, 39.2244],
+        "dar es salaam": [-6.7924, 39.2083],
+        "dar": [-6.7924, 39.2083],
         "dodoma": [-6.1731, 35.7419],
         "arusha": [-3.3869, 36.6830],
         "mwanza": [-2.5183, 32.9003],

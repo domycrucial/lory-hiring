@@ -48,6 +48,18 @@ function getDB(): PDO
 
     try {
         $pdo = new PDO($dsn, $user, $pass, $options);
+        
+        // Ensure payments table has 'wallet' enum option and commission settings are updated to 10%
+        static $schemaUpdated = false;
+        if (!$schemaUpdated) {
+            try {
+                $pdo->exec("ALTER TABLE `payments` MODIFY COLUMN `payment_method` ENUM('mpesa','airtel','halotel','card','cash','wallet') NOT NULL DEFAULT 'mpesa'");
+                $pdo->exec("UPDATE `system_settings` SET `value` = '10' WHERE `key` = 'commission_rate'");
+                $schemaUpdated = true;
+            } catch (Exception $schemaEx) {
+                error_log('[OLHS DB Schema Patch] Failed: ' . $schemaEx->getMessage());
+            }
+        }
     } catch (PDOException $e) {
         // Log error details — never expose DB credentials to the browser
         error_log('[OLHS DB] Connection failed: ' . $e->getMessage());

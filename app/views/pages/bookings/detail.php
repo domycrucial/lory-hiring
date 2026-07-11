@@ -58,13 +58,13 @@
             <script>
             document.addEventListener('DOMContentLoaded', async function() {
                 const tanzaniaLocations = {
-                    "dar es salaam": [-6.7924, 39.2083],
-                    "dar": [-6.7924, 39.2083],
                     "kariakoo": [-6.8163, 39.2755],
                     "kigamboni": [-6.8277, 39.3175],
                     "ubungo": [-6.7887, 39.2083],
                     "temeke": [-6.8524, 39.2678],
                     "kinondoni": [-6.7824, 39.2244],
+                    "dar es salaam": [-6.7924, 39.2083],
+                    "dar": [-6.7924, 39.2083],
                     "dodoma": [-6.1731, 35.7419],
                     "arusha": [-3.3869, 36.6830],
                     "mwanza": [-2.5183, 32.9003],
@@ -278,6 +278,220 @@
                         }
                     });
             });
+
+            let selectedMethod = null;
+            let currentWalletBalance = 0;
+
+            function selectPaymentOption(method) {
+                selectedMethod = method;
+                const optWallet = document.getElementById('pay-opt-wallet');
+                const optMobile = document.getElementById('pay-opt-mobile');
+                const panelWallet = document.getElementById('panel-wallet');
+                const panelMobile = document.getElementById('panel-mobile');
+
+                if (method === 'wallet') {
+                    optWallet.style.borderColor = 'var(--primary)';
+                    optWallet.style.background = 'var(--primary-bg)';
+                    optMobile.style.borderColor = 'var(--border-color)';
+                    optMobile.style.background = '';
+                    panelWallet.style.display = 'block';
+                    panelMobile.style.display = 'none';
+                } else {
+                    optMobile.style.borderColor = 'var(--primary)';
+                    optMobile.style.background = 'var(--primary-bg)';
+                    optWallet.style.borderColor = 'var(--border-color)';
+                    optWallet.style.background = '';
+                    panelMobile.style.display = 'block';
+                    panelWallet.style.display = 'none';
+                }
+            }
+
+            function depositSimulation(requiredAmount) {
+                const depositAmount = requiredAmount - currentWalletBalance;
+                const toDeposit = depositAmount > 0 ? depositAmount : 100000;
+                
+                Swal.showLoading();
+                
+                const formData = new FormData();
+                formData.append('amount', toDeposit);
+                
+                fetch('<?= APP_URL ?>/api/v1/wallet/deposit', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        currentWalletBalance = res.balance;
+                        const balanceEl = document.getElementById('modal-wallet-balance');
+                        if (balanceEl) balanceEl.innerText = Number(res.balance).toLocaleString() + ' TZS';
+                        
+                        const panelWallet = document.getElementById('panel-wallet');
+                        if (panelWallet) {
+                            panelWallet.innerHTML = `
+                               <div class="form-group" style="margin-bottom: 0;">
+                                   <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px;">Enter Amount to Pay (TZS)</label>
+                                   <input type="number" id="pay-wallet-amount" class="form-control" value="${requiredAmount}" readonly style="background: var(--gray-100);">
+                                   <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 6px; margin-bottom: 0;">Your balance after payment: <strong id="val-balance-after">${Number(res.balance - requiredAmount).toLocaleString()} TZS</strong></p>
+                               </div>
+                            `;
+                        }
+                        Swal.hideLoading();
+                        Swal.resetValidationMessage();
+                    } else {
+                        Swal.showValidationMessage(res.message);
+                    }
+                });
+            }
+
+            function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
+                selectedMethod = null;
+                currentWalletBalance = 0;
+                
+                Swal.fire({
+                    title: 'Checking Balance...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('<?= APP_URL ?>/api/v1/wallet/balance')
+                    .then(r => r.json())
+                    .then(res => {
+                        if (!res.success) {
+                            Swal.fire('Error', 'Could not retrieve wallet balance.', 'error');
+                            return;
+                        }
+                        
+                        currentWalletBalance = res.balance;
+                        
+                        const modalHtml = `
+                           <div class="swal-payment-modal" style="text-align: left; font-family: inherit;">
+                               <p style="margin-bottom: 20px;">Ref: <strong>${bookingRef}</strong> | Amount: <strong class="text-primary">${Number(quotedPrice).toLocaleString()} TZS</strong></p>
+                               
+                               <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                                   <!-- Wallet Option -->
+                                   <div id="pay-opt-wallet" style="flex: 1; border: 2px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="selectPaymentOption('wallet')">
+                                       <i class="fa-solid fa-wallet fa-2x" style="color: var(--primary); margin-bottom: 8px;"></i>
+                                       <div style="font-weight: bold;">My Wallet</div>
+                                       <div style="font-size: 0.85rem; color: var(--gray-500); margin-top: 4px;">Balance: <span id="modal-wallet-balance">${Number(res.balance).toLocaleString()} TZS</span></div>
+                                   </div>
+                                   
+                                   <!-- Mobile Money Option -->
+                                   <div id="pay-opt-mobile" style="flex: 1; border: 2px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="selectPaymentOption('mobile')">
+                                       <i class="fa-solid fa-mobile-screen-button fa-2x" style="color: var(--accent); margin-bottom: 8px;"></i>
+                                       <div style="font-weight: bold;">Lipa kwa Simu</div>
+                                       <div style="font-size: 0.85rem; color: var(--gray-500); margin-top: 4px;">Vodacom M-Pesa</div>
+                                   </div>
+                               </div>
+
+                               <!-- Wallet Details Panel -->
+                               <div id="panel-wallet" style="display: none; background: var(--gray-50); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                                   <div class="form-group" style="margin-bottom: 0;">
+                                       <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px;">Enter Amount to Pay (TZS)</label>
+                                       <input type="number" id="pay-wallet-amount" class="form-control" value="${quotedPrice}" readonly style="background: var(--gray-100);">
+                                       <p style="font-size: 0.75rem; color: var(--gray-500); margin-top: 6px; margin-bottom: 0;">Your balance after payment: <strong id="val-balance-after">${Number(res.balance - quotedPrice).toLocaleString()} TZS</strong></p>
+                                       ${res.balance < quotedPrice ? `
+                                       <div id="insufficient-funds-warning" style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                           <span style="color: var(--danger); font-size: 0.8rem; font-weight: bold;"><i class="fa-solid fa-circle-exclamation"></i> Insufficient funds!</span>
+                                           <button type="button" class="btn btn-primary btn-sm" onclick="depositSimulation(${quotedPrice})"><i class="fa-solid fa-plus"></i> Deposit Test Funds</button>
+                                       </div>
+                                       ` : ''}
+                                   </div>
+                               </div>
+
+                               <!-- Mobile Payment Panel -->
+                               <div id="panel-mobile" style="display: none; background: var(--gray-50); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                                   <p style="font-size: 0.85rem; margin-top: 0; margin-bottom: 12px;">Scan the QR code below or use Lipa Namba to complete the payment via Vodacom M-Pesa.</p>
+                                   <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=LIPA%20KWA%20SIMU%20-%20OLHS%20-%20Booking:%20${bookingRef}%20-%20Amount:%20${quotedPrice}%20TZS" alt="Lipa kwa Simu QR Code" style="border: 4px solid white; box-shadow: var(--shadow-sm); border-radius: 4px; margin-bottom: 12px; width: 180px; height: 180px;">
+                                   <div style="font-weight: 800; font-size: 1.15rem; color: var(--primary);">LIPA NAMBA: 556677</div>
+                                   <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 4px;">Merchant Name: <strong>OLHS Lorry Hiring</strong></div>
+                                   
+                                   <div class="form-group" style="margin-top: 16px; text-align: left; margin-bottom: 0;">
+                                       <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px;">Your Vodacom M-Pesa Number</label>
+                                       <input type="text" id="pay-mobile-number" class="form-control" placeholder="e.g. +255754321098" value="${customerPhone}">
+                                   </div>
+                               </div>
+                           </div>
+                        `;
+
+                        Swal.fire({
+                            title: 'Make Payment / Fanya Malipo',
+                            html: modalHtml,
+                            showCancelButton: true,
+                            confirmButtonColor: '#2563eb',
+                            cancelButtonColor: '#64748b',
+                            confirmButtonText: 'Confirm Payment',
+                            cancelButtonText: 'Cancel',
+                            width: '500px',
+                            preConfirm: () => {
+                                if (!selectedMethod) {
+                                    Swal.showValidationMessage('Please select a payment method');
+                                    return false;
+                                }
+                                if (selectedMethod === 'wallet') {
+                                    if (currentWalletBalance < quotedPrice) {
+                                        Swal.showValidationMessage('Insufficient wallet balance. Please deposit funds first.');
+                                        return false;
+                                    }
+                                    return {
+                                        booking_id: bookingId,
+                                        payment_method: 'wallet'
+                                    };
+                                } else {
+                                    const phone = document.getElementById('pay-mobile-number').value.trim();
+                                    if (!phone) {
+                                        Swal.showValidationMessage('Please enter your M-Pesa mobile number');
+                                        return false;
+                                    }
+                                    return {
+                                        booking_id: bookingId,
+                                        payment_method: 'mpesa',
+                                        phone: phone
+                                    };
+                                }
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    title: 'Processing Payment...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                const data = result.value;
+                                const formData = new FormData();
+                                formData.append('booking_id', data.booking_id);
+                                formData.append('payment_method', data.payment_method);
+                                if (data.phone) formData.append('phone', data.phone);
+                                formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
+
+                                fetch('<?= APP_URL ?>/api/v1/payments/checkout-ajax', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(r => r.json())
+                                .then(res => {
+                                    if (res.success) {
+                                        Swal.fire({
+                                            title: 'Success / Imekamilika!',
+                                            text: res.message,
+                                            icon: 'success',
+                                            confirmButtonColor: '#2563eb'
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire('Error / Hitilafu', res.message, 'error');
+                                    }
+                                });
+                            }
+                        });
+                    });
+            }
             </script>
         </div>
 
@@ -309,11 +523,18 @@
         <div>
             <!-- Checkout CTA card shown only to customer when booking is accepted by owner -->
             <?php if (currentUserRole() === 'customer' && $booking['status'] === 'accepted'): ?>
-                <div class="card p-6 text-center mb-4" style="background: var(--accent-light); border: 2px solid var(--accent);">
-                    <h3><i class="fa-solid fa-credit-card"></i> Payment Required</h3>
-                    <p class="text-sm mt-2">This booking has been accepted. Please pay to finalize your booking reservation.</p>
-                    <a href="<?= APP_URL ?>/payments/checkout/<?= (int)$booking['id'] ?>" class="btn btn-accent btn-lg btn-block mt-4"><i class="fa-solid fa-wallet"></i> Pay Now</a>
-                </div>
+                <?php if (!$isPaid): ?>
+                    <div class="card p-6 text-center mb-4" style="background: var(--accent-light); border: 2px solid var(--accent);">
+                        <h3><i class="fa-solid fa-credit-card"></i> Payment Required</h3>
+                        <p class="text-sm mt-2">This booking has been accepted. Please pay to finalize your booking reservation.</p>
+                        <button onclick="openPaymentModal(<?= (int)$booking['id'] ?>, '<?= e($booking['booking_ref']) ?>', <?= (float)$booking['quoted_price'] ?>, '<?= e($booking['customer_phone'] ?? '') ?>')" class="btn btn-accent btn-lg btn-block mt-4"><i class="fa-solid fa-wallet"></i> Pay Now</button>
+                    </div>
+                <?php else: ?>
+                    <div class="card p-6 text-center mb-4" style="background: var(--success-bg); border: 2px solid var(--success); color: var(--success-dark);">
+                        <h3><i class="fa-solid fa-circle-check"></i> Payment Completed</h3>
+                        <p class="text-sm mt-2">Your payment has been successfully received. Lorry owner will start the trip soon.</p>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <!-- Action Controls Card -->
@@ -336,11 +557,16 @@
                     
                     <!-- Lorry Owner Options on Accepted Booking -->
                     <?php elseif (currentUserRole() === 'lorry_owner' && $booking['status'] === 'accepted'): ?>
-                        <!-- Start trip action form -->
-                        <form method="POST" action="<?= APP_URL ?>/bookings/<?= (int)$booking['id'] ?>/start" class="w-full">
-                            <?= csrfField() ?>
-                            <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-truck-fast"></i> Start Trip / Anza Safari</button>
-                        </form>
+                        <?php if ($isPaid): ?>
+                            <!-- Start trip action form -->
+                            <form method="POST" action="<?= APP_URL ?>/bookings/<?= (int)$booking['id'] ?>/start" class="w-full">
+                                <?= csrfField() ?>
+                                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-truck-fast"></i> Start Trip / Anza Safari</button>
+                            </form>
+                        <?php else: ?>
+                            <button type="button" class="btn btn-outline btn-block" disabled style="opacity: 0.6; cursor: not-allowed;"><i class="fa-solid fa-lock"></i> Start Trip (Awaiting Payment)</button>
+                            <p class="text-xs text-muted text-center mt-1">Customer has not completed payment yet. / Mteja hajakamilisha malipo.</p>
+                        <?php endif; ?>
                     
                     <!-- Lorry Owner Options on In Transit Booking -->
                     <?php elseif (currentUserRole() === 'lorry_owner' && $booking['status'] === 'in_transit'): ?>

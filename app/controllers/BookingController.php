@@ -142,6 +142,11 @@ class BookingController
         }
 
         $pageTitle = 'Booking #' . e($booking['booking_ref'] ?? $id);
+        
+        $paymentModel = new Payment();
+        $payment = $paymentModel->getByBooking($id);
+        $isPaid = $payment && $payment['status'] === 'completed';
+
         require_once VIEW_PATH . '/layouts/header.php';
         require_once VIEW_PATH . '/pages/bookings/detail.php';
         require_once VIEW_PATH . '/layouts/footer.php';
