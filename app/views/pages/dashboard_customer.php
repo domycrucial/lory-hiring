@@ -3,8 +3,22 @@
         <h1><i class="fa-solid fa-chart-pie"></i> <?= currentLang() === 'sw' ? 'Dawati la Mteja' : 'Customer Dashboard' ?></h1>
         <p class="text-muted mb-6"><?= currentLang() === 'sw' ? 'Karibu tena' : 'Welcome back' ?>, <?= e(currentUserName()) ?>!</p>
 
-        <!-- Stats Metric Cards Row -->
-        <div class="grid grid-3 mb-8">
+        <!-- Stats Metric Cards Row including Wallet Balance -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-8);">
+            <!-- Wallet Balance Card -->
+            <div class="stat-card" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); position: relative; overflow: hidden;">
+                <div style="font-size: 0.75rem; uppercase; opacity: 0.85; font-weight: 700;">
+                    <i class="fa-solid fa-wallet"></i> <?= currentLang() === 'sw' ? 'Salio la Mkoba' : 'My Wallet Balance' ?>
+                </div>
+                <div class="stat-value" style="color: white; font-size: 1.6rem; margin: 8px 0;">
+                    <?= formatTZS($stats['wallet_balance'] ?? 0) ?>
+                </div>
+                <div>
+                    <a href="<?= APP_URL ?>/wallet" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 0.75rem; padding: 4px 10px;">
+                        <i class="fa-solid fa-plus"></i> <?= currentLang() === 'sw' ? 'Weka Pesa (Tigo Pesa)' : 'Deposit via Tigo Pesa' ?>
+                    </a>
+                </div>
+            </div>
             <div class="stat-card">
                 <div class="stat-value"><?= (int)($stats['total_bookings'] ?? 0) ?></div>
                 <div class="stat-label"><?= currentLang() === 'sw' ? 'Jumla ya Uhifadhi' : 'Total Bookings' ?></div>

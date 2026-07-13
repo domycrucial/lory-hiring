@@ -152,6 +152,7 @@ $routes = [
 
     // ── Wallet ────────────────────────────────────────────────
     'GET:wallet'                      => ['WalletController',       'index'],
+    'POST:wallet/deposit'             => ['WalletController',       'deposit'],
     'POST:wallet/withdraw'            => ['WalletController',       'withdraw'],
 
     // ── Admin Panel ───────────────────────────────────────────

@@ -40,8 +40,12 @@ class HomeController
         $allBookings = $bookingModel->getByCustomer($userId);
         $recentBookings = array_slice($allBookings, 0, 5);
 
+        $userModel = new User();
+        $userData  = $userModel->findById($userId);
+        $userWalletBalance = (float)($userData['wallet_balance'] ?? 0.00);
+
         // Simple stats
-        $stats = ['total_bookings' => count($allBookings), 'pending' => 0, 'completed' => 0];
+        $stats = ['total_bookings' => count($allBookings), 'pending' => 0, 'completed' => 0, 'wallet_balance' => $userWalletBalance];
         $activeBookings = [];
         foreach ($allBookings as $b) {
             if ($b['status'] === 'pending') $stats['pending']++;

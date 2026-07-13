@@ -94,7 +94,7 @@
                                 <!-- Actions shown to Customer on accepted and unpaid bookings -->
                                 <?php if (currentUserRole() === 'customer' && $b['status'] === 'accepted' && empty($b['payment_status'])): ?>
                                     <!-- Pay Now action button -->
-                                    <button onclick="openPaymentModal(<?= (int)$b['id'] ?>, '<?= e($b['booking_ref']) ?>', <?= (float)$b['quoted_price'] ?>, '<?= e($b['owner_phone'] ?? '') ?>')" class="btn btn-accent btn-sm"><i class="fa-solid fa-wallet"></i> Pay Now</button>
+                                    <button onclick="openPaymentModal(<?= (int)$b['id'] ?>, '<?= e($b['booking_ref']) ?>', <?= (float)$b['quoted_price'] ?>, '<?= e($b['owner_phone'] ?? '') ?>', '<?= e(addslashes($b['lorry_name'] ?? 'Hired Lorry')) ?>')" class="btn btn-accent btn-sm"><i class="fa-solid fa-wallet"></i> Pay Now</button>
                                 <?php endif; ?>
                             </div>
                         </td>
@@ -292,7 +292,7 @@ function depositSimulation(requiredAmount) {
     });
 }
 
-function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
+function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone, lorryName = 'Hired Lorry') {
     selectedMethod = null;
     currentWalletBalance = 0;
     
@@ -316,7 +316,14 @@ function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
             
             const modalHtml = `
                <div class="swal-payment-modal" style="text-align: left; font-family: inherit;">
-                   <p style="margin-bottom: 20px;">Ref: <strong>${bookingRef}</strong> | Amount: <strong class="text-primary">${Number(quotedPrice).toLocaleString()} TZS</strong></p>
+                   <div style="background: var(--primary-light); border: 1px solid var(--primary); padding: 12px 14px; border-radius: 8px; margin-bottom: 18px;">
+                       <div style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Lorry Hired for Delivery</div>
+                       <div style="font-size: 1.15rem; font-weight: 900; color: var(--text-color); margin: 4px 0;"><i class="fa-solid fa-truck text-primary"></i> ${lorryName}</div>
+                       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 6px;">
+                           <span>Ref: <strong>${bookingRef}</strong></span>
+                           <span>Due: <strong class="text-primary">${Number(quotedPrice).toLocaleString()} TZS</strong></span>
+                       </div>
+                   </div>
                    
                    <div style="display: flex; gap: 16px; margin-bottom: 20px;">
                        <!-- Wallet Option -->
@@ -330,7 +337,7 @@ function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
                        <div id="pay-opt-mobile" style="flex: 1; border: 2px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="selectPaymentOption('mobile')">
                            <i class="fa-solid fa-mobile-screen-button fa-2x" style="color: var(--accent); margin-bottom: 8px;"></i>
                            <div style="font-weight: bold;">Lipa kwa Simu</div>
-                           <div style="font-size: 0.85rem; color: var(--gray-500); margin-top: 4px;">Vodacom M-Pesa</div>
+                           <div style="font-size: 0.85rem; color: var(--gray-500); margin-top: 4px;">Tigo Pesa / M-Pesa</div>
                        </div>
                    </div>
 
@@ -343,7 +350,7 @@ function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
                            ${res.balance < quotedPrice ? `
                            <div id="insufficient-funds-warning" style="margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                                <span style="color: var(--danger); font-size: 0.8rem; font-weight: bold;"><i class="fa-solid fa-circle-exclamation"></i> Insufficient funds!</span>
-                               <button type="button" class="btn btn-primary btn-sm" onclick="depositSimulation(${quotedPrice})"><i class="fa-solid fa-plus"></i> Deposit Test Funds</button>
+                               <a href="<?= APP_URL ?>/wallet" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Deposit via Tigo Pesa</a>
                            </div>
                            ` : ''}
                        </div>
@@ -351,13 +358,21 @@ function openPaymentModal(bookingId, bookingRef, quotedPrice, customerPhone) {
 
                    <!-- Mobile Payment Panel -->
                    <div id="panel-mobile" style="display: none; background: var(--gray-50); border: 1px solid var(--border-color); padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
-                       <p style="font-size: 0.85rem; margin-top: 0; margin-bottom: 12px;">Scan the QR code below or use Lipa Namba to complete the payment via Vodacom M-Pesa.</p>
-                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=LIPA%20KWA%20SIMU%20-%20OLHS%20-%20Booking:%20${bookingRef}%20-%20Amount:%20${quotedPrice}%20TZS" alt="Lipa kwa Simu QR Code" style="border: 4px solid white; box-shadow: var(--shadow-sm); border-radius: 4px; margin-bottom: 12px; width: 180px; height: 180px;">
+                       <p style="font-size: 0.85rem; margin-top: 0; margin-bottom: 12px;">Scan the QR code below or use Lipa Namba to complete the payment via Tigo Pesa / M-Pesa.</p>
+                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent('LIPA KWA SIMU | Lorry Hired: ' + lorryName + ' | Ref: ' + bookingRef + ' | Amount: ' + quotedPrice + ' TZS | Merchant: OLHS System')}" alt="Lipa kwa Simu QR Code" style="border: 4px solid white; box-shadow: var(--shadow-sm); border-radius: 6px; margin-bottom: 12px; width: 180px; height: 180px;">
+                       
+                       <div style="background: white; border: 1px dashed var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 12px; text-align: left; font-size: 0.82rem;">
+                           <div><strong>Hired Lorry:</strong> ${lorryName}</div>
+                           <div><strong>Booking Ref:</strong> ${bookingRef}</div>
+                           <div><strong>Payment Due:</strong> ${Number(quotedPrice).toLocaleString()} TZS</div>
+                           <div><strong>Settlement Purpose:</strong> Lorry Transport & Cargo Booking</div>
+                       </div>
+
                        <div style="font-weight: 800; font-size: 1.15rem; color: var(--primary);">LIPA NAMBA: 556677</div>
                        <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 4px;">Merchant Name: <strong>OLHS Lorry Hiring</strong></div>
                        
                        <div class="form-group" style="margin-top: 16px; text-align: left; margin-bottom: 0;">
-                           <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px;">Your Vodacom M-Pesa Number</label>
+                           <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px;">Your Mobile Number</label>
                            <input type="text" id="pay-mobile-number" class="form-control" placeholder="e.g. +255754321098" value="${customerPhone}">
                        </div>
                    </div>

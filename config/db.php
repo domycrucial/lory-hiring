@@ -54,7 +54,7 @@ function getDB(): PDO
         if (!$schemaUpdated) {
             try {
                 $pdo->exec("ALTER TABLE `payments` MODIFY COLUMN `payment_method` ENUM('mpesa','airtel','halotel','card','cash','wallet') NOT NULL DEFAULT 'mpesa'");
-                $pdo->exec("UPDATE `system_settings` SET `value` = '10' WHERE `key` = 'commission_rate'");
+                $pdo->exec("UPDATE `system_settings` SET `setting_val` = '10' WHERE `setting_key` = 'commission_rate'");
                 $schemaUpdated = true;
             } catch (Exception $schemaEx) {
                 error_log('[OLHS DB Schema Patch] Failed: ' . $schemaEx->getMessage());

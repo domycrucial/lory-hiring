@@ -44,7 +44,8 @@
         <!-- Right Column: Order Summary details card -->
         <div class="card p-6">
             <h3 class="mb-4"><i class="fa-solid fa-receipt"></i> Order Summary</h3>
-            <table class="table">
+            <table class="table mb-6">
+                <tr><td>Lorry Hired</td><td><strong><i class="fa-solid fa-truck text-primary"></i> <?= e($booking['lorry_name'] ?? 'Hired Lorry') ?></strong></td></tr>
                 <tr><td>Booking Ref</td><td><strong><?= e($booking['booking_ref'] ?? '#' . $booking['id']) ?></strong></td></tr>
                 <tr><td>Pickup</td><td>📍 <?= e($booking['pickup_address'] ?? '—') ?></td></tr>
                 <tr><td>Delivery</td><td>📍 <?= e($booking['delivery_address'] ?? '—') ?></td></tr>
@@ -52,6 +53,16 @@
                 <!-- Final highlighted price total -->
                 <tr style="font-size:1.1rem;"><td class="font-bold">Total</td><td class="font-bold text-primary"><?= number_format((float)($booking['quoted_price'] ?? 0)) ?> TZS</td></tr>
             </table>
+
+            <!-- QR Code Card -->
+            <div style="background: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; text-align: center;">
+                <div style="font-weight: 700; font-size: 0.85rem; color: var(--primary); text-transform: uppercase; margin-bottom: 8px;">Scan to Pay via Tigo Pesa / M-Pesa</div>
+                <?php
+                $qrPayload = urlencode("OLHS PAY | Lorry Hired: " . ($booking['lorry_name'] ?? 'Hired Lorry') . " | Ref: " . ($booking['booking_ref'] ?? '') . " | Amount: " . ((float)($booking['quoted_price'] ?? 0)) . " TZS | Merchant: OLHS");
+                ?>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=<?= $qrPayload ?>" alt="Payment QR Code" style="border: 4px solid white; border-radius: 6px; box-shadow: var(--shadow-sm); width: 150px; height: 150px; margin-bottom: 8px;">
+                <div style="font-size: 0.8rem; color: var(--gray-600);">LIPA NAMBA: <strong>556677</strong></div>
+            </div>
         </div>
     </div>
 </div>

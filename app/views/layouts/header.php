@@ -181,6 +181,7 @@ $inDashboard = isLoggedIn();
                 <a href="<?= APP_URL ?>/dashboard/customer" class="sidebar-link <?= ($currentPage ?? '') === 'dashboard' ? 'active' : '' ?>"><i class="fa-solid fa-chart-line"></i> <span class="link-text">Customer Dashboard</span></a>
                 <a href="<?= APP_URL ?>/lorries/search" class="sidebar-link <?= ($requestUri === 'lorries/search') ? 'active' : '' ?>"><i class="fa-solid fa-truck"></i> <span class="link-text">Search Lorries</span></a>
                 <a href="<?= APP_URL ?>/bookings/mine" class="sidebar-link <?= (str_starts_with($requestUri, 'bookings/mine') || str_starts_with($requestUri, 'bookings/detail') || str_starts_with($requestUri, 'bookings/create')) ? 'active' : '' ?>"><i class="fa-solid fa-calendar-check"></i> <span class="link-text">My Bookings</span></a>
+                <a href="<?= APP_URL ?>/wallet" class="sidebar-link <?= ($currentPage ?? '') === 'wallet' ? 'active' : '' ?>"><i class="fa-solid fa-wallet"></i> <span class="link-text">My Wallet</span></a>
                 <a href="<?= APP_URL ?>/payments/history" class="sidebar-link <?= ($requestUri === 'payments/history' || str_starts_with($requestUri, 'payments/success')) ? 'active' : '' ?>"><i class="fa-solid fa-clock-rotate-left"></i> <span class="link-text">Payment History</span></a>
                 <a href="<?= APP_URL ?>/profile" class="sidebar-link <?= ($currentPage ?? '') === 'profile' ? 'active' : '' ?>"><i class="fa-solid fa-user-gear"></i> <span class="link-text">My Profile</span></a>
             <?php else: ?>
